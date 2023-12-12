@@ -28,59 +28,72 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            button2 = new Button();
-            button3 = new Button();
+            TicTacToe = new Button();
+            Notepad = new Button();
+            Interact = new Button();
+            hungerLabel = new Label();
             SuspendLayout();
             // 
-            // button1
+            // TicTacToe
             // 
-            button1.Location = new Point(12, 20);
-            button1.Name = "button1";
-            button1.Size = new Size(112, 34);
-            button1.TabIndex = 0;
-            button1.Text = "TicTacToe";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            TicTacToe.Location = new Point(12, 315);
+            TicTacToe.Name = "TicTacToe";
+            TicTacToe.Size = new Size(112, 34);
+            TicTacToe.TabIndex = 0;
+            TicTacToe.Text = "TicTacToe";
+            TicTacToe.UseVisualStyleBackColor = true;
+            TicTacToe.Click += TicTacToe_Click;
             // 
-            // button2
+            // Notepad
             // 
-            button2.Location = new Point(12, 60);
-            button2.Name = "button2";
-            button2.Size = new Size(112, 34);
-            button2.TabIndex = 1;
-            button2.Text = "Notepad";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            Notepad.Location = new Point(12, 235);
+            Notepad.Name = "Notepad";
+            Notepad.Size = new Size(112, 34);
+            Notepad.TabIndex = 1;
+            Notepad.Text = "Notepad";
+            Notepad.UseVisualStyleBackColor = true;
+            Notepad.Click += Notepad_Click;
             // 
-            // button3
+            // Interact
             // 
-            button3.Location = new Point(12, 100);
-            button3.Name = "button3";
-            button3.Size = new Size(112, 34);
-            button3.TabIndex = 2;
-            button3.Text = "Interact";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
+            Interact.Location = new Point(12, 275);
+            Interact.Name = "Interact";
+            Interact.Size = new Size(112, 34);
+            Interact.TabIndex = 2;
+            Interact.Text = "Interact";
+            Interact.UseVisualStyleBackColor = true;
+            Interact.Click += Interact_Click;
+            // 
+            // hungerLabel
+            // 
+            hungerLabel.AutoSize = true;
+            hungerLabel.Location = new Point(12, 9);
+            hungerLabel.Name = "hungerLabel";
+            hungerLabel.Size = new Size(59, 25);
+            hungerLabel.TabIndex = 3;
+            hungerLabel.Text = "label1";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(2567, 359);
-            Controls.Add(button3);
-            Controls.Add(button2);
-            Controls.Add(button1);
+            Controls.Add(hungerLabel);
+            Controls.Add(Interact);
+            Controls.Add(Notepad);
+            Controls.Add(TicTacToe);
             Name = "Form1";
             Text = "My Virtual Pet";
             Load += Form1_Load;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
-        private Button button1;
-        private Button button2;
-        private Button button3;
+        private Button TicTacToe;
+        private Button Notepad;
+        private Button Interact;
+        private Label hungerLabel;
     }
 }

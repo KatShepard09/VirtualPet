@@ -19,21 +19,21 @@ namespace VirtualPetDraft2
         static extern bool AllocConsole();
 
         //TicTacToe Button - Lets user play a simple game of TicTacToe with pet
-        private void button1_Click(object sender, EventArgs e)
+        private void TicTacToe_Click(object sender, EventArgs e)
         {
             TicTacToe game = new TicTacToe();
             game.Show();
         }
 
         //Notepad Button - Lets user make a text document that can later be saved and opened at a later point
-        private void button2_Click(object sender, EventArgs e)
+        private void Notepad_Click(object sender, EventArgs e)
         {
             Notepad game = new Notepad();
             game.Show();
         }
 
         //Interact Button - Lets user interact with the pet by opening up console interactions
-        private void button3_Click(object sender, EventArgs e)
+        private void Interact_Click(object sender, EventArgs e)
         {
             AllocConsole();
             while (true)
@@ -69,6 +69,7 @@ namespace VirtualPetDraft2
             InitializePet();
             InitializeTimer();
             InitializeHungerTimer();
+            InitializeUI();
 
 
             // Set the form's start position to manual
@@ -104,6 +105,15 @@ namespace VirtualPetDraft2
             timer.Interval = 100;
             timer.Tick += (sender, e) => MovePet();
             timer.Start();
+        }
+
+        private void InitializeUI()
+        {
+            // Initialize hunger label
+            hungerLabel.Text = $"Hunger Level: {PetHunger}";
+            hungerLabel.AutoSize = true;
+            hungerLabel.Location = new Point(10, 10); // Adjust the location as needed
+            Controls.Add(hungerLabel);
         }
 
         private void MovePet()
@@ -146,6 +156,7 @@ namespace VirtualPetDraft2
             if (PetHunger > 0)
             {
                 PetHunger--;
+                hungerLabel.Text = $"Hunger Level: {PetHunger}"; // Update the hunger label
                 Console.WriteLine($"Your pet's fullness is at {PetHunger}");
             }
         }
