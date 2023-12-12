@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -10,6 +10,7 @@ namespace VirtualPetDraft2
         private readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer(); // timer that moves the pet periodically
         private readonly Random random = new Random(); // random number generator for the pet movement 
         private readonly PictureBox PetPictureBox = new PictureBox(); // displays pet image
+        private readonly PictureBox FoodPictureBox = new PictureBox(); // for the food
         private int PetHunger = 0;
         private int MaxPetHunger = 5;
         private readonly System.Windows.Forms.Timer hungerTimer = new System.Windows.Forms.Timer();
@@ -32,36 +33,18 @@ namespace VirtualPetDraft2
             game.Show();
         }
 
-        //Interact Button - Lets user interact with the pet by opening up console interactions
-        private void Interact_Click(object sender, EventArgs e)
+
+        //List of random phrases for when pet is clicked on
+        private readonly List<string> petPhrases = new List<string>
         {
-            AllocConsole();
-            while (true)
-            {
-                Console.WriteLine("Welcome to your Virtual Pet! How would you like to interact with your pet? [Feed, Talk To]");
-                string UInteractChoice = Console.ReadLine();
+            "Hi Hi !",
+            "Feed me !",
+            "＼(^o^)／",
+            "Let's play a game !",
+            "How are you doing ?",
+            "(◕‿◕✿)",
+        };
 
-                switch (UInteractChoice)
-                {
-                    case "Feed":
-                        PetHunger++;
-                        if (PetHunger >= MaxPetHunger)
-                        {
-                            Console.WriteLine("Your pet is too full! Please wait a bit before feeding again");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Your pet's fullness is at {PetHunger}");
-                        }
-                        break;
-
-                    case "Talk To":
-                        int TalkLine = new Random().Next(0, 5);
-                        Console.WriteLine(TalkLine);
-                        break;
-                }
-            }
-        }
 
         public Form1()
         {
@@ -70,7 +53,6 @@ namespace VirtualPetDraft2
             InitializeTimer();
             InitializeHungerTimer();
             InitializeUI();
-
 
             // Set the form's start position to manual
             this.StartPosition = FormStartPosition.Manual;
@@ -85,6 +67,8 @@ namespace VirtualPetDraft2
             int initialY = screenHeight - formHeight; // Place at the bottom
 
             this.Location = new Point(initialX, initialY);
+
+
         }
 
         //Draws the pet onto the screem
@@ -94,10 +78,70 @@ namespace VirtualPetDraft2
             PetPictureBox.Size = new Size(100, 100);
             PetPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             PetPictureBox.Location = new Point(random.Next(0, this.ClientSize.Width - 50), random.Next(0, this.ClientSize.Height - 50));
-
-            //When pet is clicked, message is shown
-            PetPictureBox.Click += (sender, e) => { MessageBox.Show("Hi Hi!!"); };
+            PetPictureBox.Click += (sender, e) =>
+            {
+                string randomPhrase = GetRandomPetPhrase();
+                MessageBox.Show(randomPhrase);
+            };
             Controls.Add(PetPictureBox);
+
+            // Initialize the food
+            FoodPictureBox.Image = Properties.Resources.Food;
+            FoodPictureBox.Size = new Size(50, 50);
+            FoodPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            FoodPictureBox.Location = new Point(random.Next(0, this.ClientSize.Width - 50), random.Next(0, this.ClientSize.Height - 50));
+            Controls.Add(FoodPictureBox);
+
+            // Set up drag-and-drop events for the food
+            FoodPictureBox.AllowDrop = true;
+            FoodPictureBox.MouseDown += FoodPictureBox_MouseDown;
+            PetPictureBox.AllowDrop = true;
+            PetPictureBox.DragEnter += PetPictureBox_DragEnter;
+            PetPictureBox.DragDrop += PetPictureBox_DragDrop;
+        }
+
+        private void FoodPictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Start the drag-and-drop operation for the food
+            if (sender is PictureBox foodPictureBox)
+            {
+                foodPictureBox.DoDragDrop(foodPictureBox, DragDropEffects.Move);
+            }
+        }
+
+        private void PetPictureBox_DragEnter(object sender, DragEventArgs e)
+        {
+            // Allow the food to be dropped onto the pet
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void PetPictureBox_DragDrop(object sender, DragEventArgs e)
+        {
+            // Handle the drop event for the pet
+            FeedPet();
+        }
+
+        private void FeedPet()
+        {
+            // Check if the pet is too full
+            if (PetHunger >= MaxPetHunger)
+            {
+                MessageBox.Show("Your pet is too full! Please try again later.");
+                return;
+            }
+
+            // Reset the food's position
+            FoodPictureBox.Location = new Point(random.Next(0, this.ClientSize.Width - 50), random.Next(0, this.ClientSize.Height - 50));
+
+            // Increment the pet's hunger
+            PetHunger++;
+            MessageBox.Show($"Your pet's fullness is at {PetHunger}");
+        }
+
+        private string GetRandomPetPhrase()
+        {
+            int index = random.Next(petPhrases.Count);
+            return petPhrases[index];
         }
 
         private void InitializeTimer()
@@ -118,18 +162,26 @@ namespace VirtualPetDraft2
 
         private void MovePet()
         {
-            int moveX = random.Next(-20, 21);
-            int moveY = random.Next(-10, 11);
+            const int maxStep = 5; // Maximum movement distance in pixels
+            const double smoothingFactor = 0.1; // Smoothing factor for movement
 
-            int newX = PetPictureBox.Location.X + moveX;
-            int newY = PetPictureBox.Location.Y + moveY;
+            // Calculate a random direction vector
+            double angle = random.NextDouble() * 2 * Math.PI;
+            double deltaX = Math.Cos(angle);
+            double deltaY = Math.Sin(angle);
 
-            // Apply smoothing factor (e.g., 0.2) to make the movement smoother
-            int smoothedX = (int)(PetPictureBox.Location.X + 0.2 * (newX - PetPictureBox.Location.X));
-            int smoothedY = (int)(PetPictureBox.Location.Y + 0.2 * (newY - PetPictureBox.Location.Y));
+            // Calculate the next position
+            int newX = (int)(PetPictureBox.Location.X + maxStep * smoothingFactor * deltaX);
+            int newY = (int)(PetPictureBox.Location.Y + maxStep * smoothingFactor * deltaY);
 
+            // Apply smoothing factor to make the movement smoother
+            int smoothedX = (int)(PetPictureBox.Location.X + smoothingFactor * (newX - PetPictureBox.Location.X));
+            int smoothedY = (int)(PetPictureBox.Location.Y + smoothingFactor * (newY - PetPictureBox.Location.Y));
+
+            // Set the new position
             PetPictureBox.Location = new Point(smoothedX, smoothedY);
 
+            // Ensure the pet stays within the form boundaries
             ClampPetLocation();
         }
 
@@ -146,7 +198,7 @@ namespace VirtualPetDraft2
 
         private void InitializeHungerTimer()
         {
-            hungerTimer.Interval = 5000; // Set the interval to 5000 milliseconds (5 seconds)
+            hungerTimer.Interval = 10000; // Set the interval to 10000 milliseconds (10 seconds)
             hungerTimer.Tick += (sender, e) => DecreasePetHunger();
             hungerTimer.Start();
         }
@@ -156,10 +208,16 @@ namespace VirtualPetDraft2
             if (PetHunger > 0)
             {
                 PetHunger--;
-                hungerLabel.Text = $"Hunger Level: {PetHunger}"; // Update the hunger label
-                Console.WriteLine($"Your pet's fullness is at {PetHunger}");
+
+                // Use BeginInvoke to update UI elements on the main UI thread
+                BeginInvoke(new Action(() =>
+                {
+                    hungerLabel.Text = $"Hunger Level: {PetHunger}";
+                    Console.WriteLine($"Your pet's fullness is at {PetHunger}");
+                }));
             }
         }
+
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {

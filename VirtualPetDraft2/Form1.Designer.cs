@@ -30,7 +30,6 @@
         {
             TicTacToe = new Button();
             Notepad = new Button();
-            Interact = new Button();
             hungerLabel = new Label();
             SuspendLayout();
             // 
@@ -46,23 +45,13 @@
             // 
             // Notepad
             // 
-            Notepad.Location = new Point(12, 235);
+            Notepad.Location = new Point(12, 275);
             Notepad.Name = "Notepad";
             Notepad.Size = new Size(112, 34);
             Notepad.TabIndex = 1;
             Notepad.Text = "Notepad";
             Notepad.UseVisualStyleBackColor = true;
             Notepad.Click += Notepad_Click;
-            // 
-            // Interact
-            // 
-            Interact.Location = new Point(12, 275);
-            Interact.Name = "Interact";
-            Interact.Size = new Size(112, 34);
-            Interact.TabIndex = 2;
-            Interact.Text = "Interact";
-            Interact.UseVisualStyleBackColor = true;
-            Interact.Click += Interact_Click;
             // 
             // hungerLabel
             // 
@@ -77,9 +66,9 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(163, 177, 138);
             ClientSize = new Size(2567, 359);
             Controls.Add(hungerLabel);
-            Controls.Add(Interact);
             Controls.Add(Notepad);
             Controls.Add(TicTacToe);
             Name = "Form1";
@@ -93,7 +82,6 @@
 
         private Button TicTacToe;
         private Button Notepad;
-        private Button Interact;
         private Label hungerLabel;
     }
 }
