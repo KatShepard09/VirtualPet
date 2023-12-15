@@ -15,10 +15,6 @@ namespace VirtualPetDraft2
         private int MaxPetHunger = 5;
         private readonly System.Windows.Forms.Timer hungerTimer = new System.Windows.Forms.Timer();
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AllocConsole();
-
         //TicTacToe Button - Lets user play a simple game of TicTacToe with pet
         private void TicTacToe_Click(object sender, EventArgs e)
         {
@@ -45,6 +41,11 @@ namespace VirtualPetDraft2
             "(◕‿◕✿)",
         };
 
+        private string GetRandomPetPhrase()
+        {
+            int index = random.Next(petPhrases.Count);
+            return petPhrases[index];
+        }
 
         public Form1()
         {
@@ -100,6 +101,31 @@ namespace VirtualPetDraft2
             PetPictureBox.DragDrop += PetPictureBox_DragDrop;
         }
 
+        private void InitializeTimer()
+        {
+            timer.Interval = 100;
+            timer.Tick += (sender, e) => MovePet();
+            timer.Start();
+        }
+
+        private void InitializeUI()
+        {
+            // Initialize hunger label
+            hungerLabel.Text = $"Hunger Level: {PetHunger}";
+            hungerLabel.AutoSize = true;
+            hungerLabel.Location = new Point(10, 10); // Adjust the location as needed
+            Controls.Add(hungerLabel);
+        }
+
+        //Set up Hunger Timer
+        private void InitializeHungerTimer()
+        {
+            hungerTimer.Interval = 10000; // Set the interval to 10000 milliseconds (10 seconds)
+            hungerTimer.Tick += (sender, e) => DecreasePetHunger();
+            hungerTimer.Start();
+        }
+
+        //Clicking and dragging on the food picture box
         private void FoodPictureBox_MouseDown(object sender, MouseEventArgs e)
         {
             // Start the drag-and-drop operation for the food
@@ -135,34 +161,33 @@ namespace VirtualPetDraft2
 
             // Increment the pet's hunger
             PetHunger++;
+            // Using BeginInvoke to update UI elements on the main UI thread
+            BeginInvoke(new Action(() =>
+            {
+                hungerLabel.Text = $"Hunger Level: {PetHunger}";
+                Console.WriteLine($"Your pet's fullness is at {PetHunger}");
+            }));
             MessageBox.Show($"Your pet's fullness is at {PetHunger}");
         }
 
-        private string GetRandomPetPhrase()
+        private void DecreasePetHunger()
         {
-            int index = random.Next(petPhrases.Count);
-            return petPhrases[index];
-        }
+            if (PetHunger > 0)
+            {
+                PetHunger--;
 
-        private void InitializeTimer()
-        {
-            timer.Interval = 100;
-            timer.Tick += (sender, e) => MovePet();
-            timer.Start();
-        }
-
-        private void InitializeUI()
-        {
-            // Initialize hunger label
-            hungerLabel.Text = $"Hunger Level: {PetHunger}";
-            hungerLabel.AutoSize = true;
-            hungerLabel.Location = new Point(10, 10); // Adjust the location as needed
-            Controls.Add(hungerLabel);
+                // Using BeginInvoke to update UI elements on the main UI thread
+                BeginInvoke(new Action(() =>
+                {
+                    hungerLabel.Text = $"Hunger Level: {PetHunger}";
+                    Console.WriteLine($"Your pet's fullness is at {PetHunger}");
+                }));
+            }
         }
 
         private void MovePet()
         {
-            const int maxStep = 5; // Maximum movement distance in pixels
+            const int maxStep = 30; // Maximum movement distance in pixels
             const double smoothingFactor = 0.1; // Smoothing factor for movement
 
             // Calculate a random direction vector
@@ -194,28 +219,6 @@ namespace VirtualPetDraft2
                 Math.Max(0, Math.Min(PetPictureBox.Location.X, maxX)),
                 Math.Max(0, Math.Min(PetPictureBox.Location.Y, maxY))
             );
-        }
-
-        private void InitializeHungerTimer()
-        {
-            hungerTimer.Interval = 10000; // Set the interval to 10000 milliseconds (10 seconds)
-            hungerTimer.Tick += (sender, e) => DecreasePetHunger();
-            hungerTimer.Start();
-        }
-
-        private void DecreasePetHunger()
-        {
-            if (PetHunger > 0)
-            {
-                PetHunger--;
-
-                // Use BeginInvoke to update UI elements on the main UI thread
-                BeginInvoke(new Action(() =>
-                {
-                    hungerLabel.Text = $"Hunger Level: {PetHunger}";
-                    Console.WriteLine($"Your pet's fullness is at {PetHunger}");
-                }));
-            }
         }
 
 
